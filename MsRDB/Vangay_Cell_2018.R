@@ -1,10 +1,16 @@
+source("./MsRDB/Algorithm.R")
+source("./MsRDB/ASVwise.R")
+source("./MsRDB/MultiATE.R")
+
 library(biomformat)
-library(microbiome)
 library(tidyverse)
 library(phyloseq)
+library(ggplot2)
+library(dada2)
+library(DECIPHER)
 library(ANCOMBC)
 library(ALDEx2)
-library(ggplot2)
+library(microbiome)
 
 ########################################
 ## Read Data
@@ -126,7 +132,7 @@ for (i in 1:length(CompareGroup)) {
   TAX = tax_table(tax_mat)
   physeq = phyloseq(OTU, META, TAX)
   ancombcRe=ancombc(phyloseq=physeq,formula="group+age+bmi",p_adj_method="bonferroni",alpha = 0.1, zero_cut=1)
-  
+
   Xmatrix <- model.matrix(as.formula("~ group+age+bmi"), meta_mat)
   aclr <- aldex.clr(t(seqtabInterest), Xmatrix)
   aldexRe <- aldex.glm(aclr)
@@ -175,7 +181,7 @@ for (i in 1:length(CompareGroup)) {
   physeq = phyloseq(OTU, META, TAX)
   physeq = aggregate_taxa(physeq, "Genus")
   ancombcRe=ancombc(phyloseq=physeq,formula="group+age+bmi",p_adj_method="bonferroni",alpha = 0.1, zero_cut=1)
-  
+
   Xmatrix <- model.matrix(as.formula("~ group+age+bmi"), meta_mat)
   aclr <- aldex.clr(t(genustabInterest), Xmatrix)
   aldexRe <- aldex.glm(aclr)
@@ -454,6 +460,7 @@ df<-data.frame(df/Benchmark)
 df=cbind(df,Z)
 df$Group <- as.factor(df$Z)
 df$Combine=apply(df[,2:5],1,sum)
+df$Diff=df$X.Ruminococcus..torques.group-df$Combine
 
 mean(df$Combine[df$Z==GroupInterest[1]]>0)
 mean(df$Combine[df$Z==GroupInterest[2]]>0)

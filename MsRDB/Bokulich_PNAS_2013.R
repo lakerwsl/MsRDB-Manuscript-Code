@@ -1,6 +1,14 @@
+source("./MsRDB/Algorithm.R")
+source("./MsRDB/ASVwise.R")
+source("./MsRDB/MultiATE.R")
+
 library(biomformat)
 library(tidyverse)
+library(phyloseq)
 library(ggplot2)
+library(dada2)
+library(DECIPHER)
+library(microbiome)
 
 ########################################
 ## Read Data
@@ -144,7 +152,7 @@ for (i in 1:length(CompareGroup)) {
   
   seqtabInterest=seqtab[c(Group1,Group2),]
   Z=c(rep(1,length(Group1)),rep(0,length(Group2)))
-  X=meta[c(Group1,Group2),CovariateInterest]
+  X=NULL
   MsRDBResult15.cluster[[i]] <- msrdb.cluster(MsRDBResult15[[i]],15, 10,seqtabInterest) 
 }
 
@@ -156,7 +164,7 @@ for (i in 1:length(CompareGroup)) {
   
   seqtabInterest=seqtab[c(Group1,Group2),]
   Z=c(rep(1,length(Group1)),rep(0,length(Group2)))
-  X=meta[c(Group1,Group2),CovariateInterest]
+  X=NULL
   members <- MsRDBResult15.cluster[[i]]$membership
   numcluster <- max(members)
   taxacluster <- list()
@@ -254,7 +262,7 @@ Group2<-meta$sample_name[meta$area==GroupInterest[2]&SampleList]
 
 seqtabInterest=seqtab[c(Group1,Group2),]
 Z=c(rep(GroupInterest[1],length(Group1)),rep(GroupInterest[2],length(Group2)))
-X=meta[c(Group1,Group2),CovariateInterest]
+X=NULL
 members <- MsRDBResult15.cluster[[k]]$membership
 df=cbind(Micrococcaceae=apply(seqtabInterest[,members==j1,drop=FALSE],1,sum),Geodermatophilaceae=apply(seqtabInterest[,members==j2,drop=FALSE],1,sum), Kineosporiaceae=apply(seqtabInterest[,members==j3,drop=FALSE],1,sum))
 Benchmark <- apply(seqtabInterest[,!MsRDBResult15[[k]]$Sig],1,sum)
